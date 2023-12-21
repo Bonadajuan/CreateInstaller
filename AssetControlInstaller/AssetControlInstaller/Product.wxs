@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+	 xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension" 
+	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" 
+	 xmlns:sql="http://schemas.microsoft.com/wix/SqlExtension">
+	
+	<Product Id="*" Name="Control de Activos" Language="3082" Version="1.0.0.0" Manufacturer="Telectronica S.A." UpgradeCode="ed8a96ba-2d85-4968-af3f-07201fa24da9">
+
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"/>
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<!--LLAMA A CADA UNA DE LAS CARACTERISTICAS QUE REALIZA EL INSTALADOR-->
+		<Feature Id="ProductFeature" Title="AssetControlInstaller" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="cmpMyAppFolderSetup" />
+			<ComponentGroupRef Id="sqlComponents" />
+		</Feature>
+
+	    <UIRef Id="CustomInstallDir"/>
+		<Property Id="WIXUI_INSTALLDIR" Value="MyWebsiteFolder" />
+		
+		<!--ASOCIACION DE VARIABLES Y ARCHIVO PARA UTILIZAR EN SQL-->
+		<Binary Id="CreateUpsizingDatabase" SourceFile="resource\install_data.sql" />
+		<util:User Id="SQLUser" Name="[USER_NAME]" Password="[PASSWORD_NAME]" />
+		<sql:SqlDatabase Id="SqlDatabase" Database="[DATABASE_NAME]" Server="[SERVER_NAME]" User="SQLUser" />
+
+		<!--ASOCIA EL ARCHIVO DE LICENCIA AL INSTALADOR-->
+		<WixVariable Id="WixUILicenseRtf" Value="resource\CustomLicense.rtf"/>
+		
+		<!--ASOCIA IMAGENES EN EL INSTALADOR-->
+		<WixVariable Id="WixUIBannerBmp" Value="resource\Control-de-Activos-blanco.png" />
+		<WixVariable Id="WixUIDialogBmp" Value="resource\Logo-Telectronica-Blanco-235x69.png" />
+
+		<!--
+			WixUIBannerBmp 493 by 58 pixels, this bitmap will appear at the top of all but the first page of the installer.
+			WixUIDialogBmp 493 by 312 pixels, this bitmap will appear on the first page of the installer.
+			WixUIExclamationIco 32 by 32 pixels, exclamation mark icon.
+			WixUIInfoIco 32 by 32 pixels, information sign icon.
+			WixUINewIco 16 by 16 pixels, new folder icon.
+			WixUIUpIco 16 by 16 pixels, parent folder icon.
+			WixUILicenseRtf Preferably, use a simple editor like Wordpad to create it, or if you insist on overly complex 
+			applications like Word, consider resaving the final version from Wordpad, anyway. The RTF will be less 
+			complicated and smaller.
+		-->
+		
+		<!--CREA UN LOGO DE LA APP DENTRO DE AGREGAR PROGRAMAS-->
+		<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+		<Icon Id="icon.ico" SourceFile="resource\icon.ico"/>
+
+	</Product>
+	
+	<Fragment>
+		<!--CREA EL DIRECTORIO DE DESTINO EL CUAL TIENE QUE SER IGUAL AL DIRECTORIO DE  MYSETUP.EXE SINO VAN SER DIFERENTES-->
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="Inetpub" Name="Inetpub">
+				<Directory Id="wwwroot" Name="wwwroot">
+					<Directory Id="MyWebsiteFolder" Name="AssetControlFiles" />
+				</Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<!--CREA LA INSTANCIA EN IIS TANTO SU POOL COMO EL SITIO-->
+		<ComponentGroup Id="ProductComponents" Directory="MyWebsiteFolder">
+			<Component Id="cmpMyAppPool" Guid="{27D7BA04-706A-4755-9ACF-D026C6A7C1E9}" KeyPath="yes">
+				<iis:WebAppPool Id="MyAppPool"
+								Name="AssetControl"
+								ManagedRuntimeVersion="v4.0"
+								ManagedPipelineMode="integrated"
+								Identity="localSystem" />
+			</Component>
+
+			<Component Id="cmpMyWebsite" Guid="{95565B4A-C24A-4F64-9644-DE64973DE6B3}" KeyPath="yes">
+				<iis:WebSite Id="website_MyWebsite"
+						Description="AssetControl"
+						ConfigureIfExists="yes"
+						Directory="MyWebsiteFolder">
+					<iis:WebApplication Id="webapplication_MyWebsite"
+								Name="AssetControl"
+								WebAppPool="MyAppPool" />
+					<iis:WebAddress Id="webaddress_MyWebsite"
+							Port="80" />
+				</iis:WebSite>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		
+		<!--COPIADO DE ARCHIVOS-->
+		<ComponentGroup Id="cmpMyAppFolderSetup" Directory="MyWebsiteFolder">
+			<Component Id="cmp7AB5216B2DB54A8A9293F6711FFAAA83" Guid="{7AB5216B-2DB5-4A8A-9293-F6711FFAAA83}">
+				<File Id="mainAppEXE" Source="resource\mysetup.exe" />
+				<File Id="mainWebConfig" Source="resource\Web.config" />
+				<File Id="mainInstallData" Source="resource\install_data.sql" />
+			</Component>
+			
+			<!--EDITAR UNA CLAVE DE UN CONNECTION-->
+			<Component Id="cmpUpdateSampleXML" Guid="{CE1F79BC-337A-44FA-9D41-7825564B5CC9}" KeyPath="yes">
+				<util:XmlConfig Id="setConnString"
+								File="[MyWebsiteFolder]Web.config"
+								Action="create"
+								On="install"
+								Node="value"
+								Name="connectionString"
+								Value="data source=[SERVER_NAME];initial catalog=[DATABASE_NAME];persist security info=True;user id=[USER_NAME];password=[PASSWORD_NAME]"
+								ElementPath="//configuration/connectionStrings/add[\[]@name='Infrastructure.Data.UnitOfWork'[\]]"
+								Sequence="1" />
+			</Component>
+		</ComponentGroup>	
+
+		<!--CREA EL INSTALADOR DE COPIADO-->
+		<CustomAction
+			 Id="RunMainApp"
+			 FileKey="mainAppEXE"
+			 ExeCommand="install"
+			 Impersonate="yes"
+			 Execute="immediate"
+			 Return="ignore" />
+		
+		<!--EJECUTA EL INSTALADOR DE COPIADO-->
+		<InstallExecuteSequence>
+			<Custom Action="RunMainApp" After="InstallFinalize" />
+		</InstallExecuteSequence>
+	
+	</Fragment>
+
+	<Fragment>
+		<!--EJECUTA EL SCRIPT DE SQL-->
+        <ComponentGroup Id="sqlComponents" Directory="MyWebsiteFolder">
+		  <Component Id="SqlComponent" Guid="15CCE46E-8EA5-42CA-80C5-AC3DB30A9716">
+			<sql:SqlScript Id="CreateDatabases" 
+						   SqlDb="SqlDatabase" 
+						   ExecuteOnInstall="yes" 
+						   BinaryKey="CreateUpsizingDatabase" /> 
+			<CreateFolder/>
+		  </Component>
+        </ComponentGroup>	
+    </Fragment>
+
+</Wix>

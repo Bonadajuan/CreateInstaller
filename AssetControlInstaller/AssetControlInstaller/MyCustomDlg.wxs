@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <UI>
+            <Dialog Id="MyCustomDlg" Width="370" Height="270" Title="Conexión de la Base de Datos">
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+                <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+
+                <Control Id="DatabaseNameLabel" Type="Text" Text="Database name:" X="20" Y="60" Width="100" Height="17" />
+                <Control Id="DatabaseNameTextbox" Type="Edit" Property="DATABASE_NAME" X="20" Y="80" Width="100" Height="17" />
+
+				<Control Id="ServerNameLabel" Type="Text" Text="Server name:" X="20" Y="100" Width="100" Height="17" />
+				<Control Id="ServerNameTextbox" Type="Edit" Property="SERVER_NAME" X="20" Y="120" Width="100" Height="17" />
+
+				<Control Id="UserNameLabel" Type="Text" Text="User name:" X="20" Y="140" Width="100" Height="17" />
+				<Control Id="UserNameTextbox" Type="Edit" Property="USER_NAME" X="20" Y="160" Width="100" Height="17" />
+
+				<Control Id="PasswordNameLabel" Type="Text" Text="Password name:" X="20" Y="180" Width="100" Height="17" />
+				<Control Id="PasswordNameTextbox" Type="Edit" Property="PASSWORD_NAME" X="20" Y="200" Width="100" Height="17" />
+
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Ingresar los siguientes datos:" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="Ingresar Datos de Conexion hacia la Base de Datos" />
+                <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+            </Dialog>
+        </UI>
+    </Fragment>
+</Wix>

@@ -1,0 +1,3 @@
+resource\mysetup.exe
+resource\install_data.sql
+resource\Web.config

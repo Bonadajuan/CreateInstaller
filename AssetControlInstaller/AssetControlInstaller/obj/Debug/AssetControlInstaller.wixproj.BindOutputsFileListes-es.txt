@@ -1,0 +1,2 @@
+C:\Telectronica\Miscellaneous\SetupProjects\AssetControlInstaller\AssetControlInstaller\bin\Debug\es-es\AssetControlInstaller.msi
+C:\Telectronica\Miscellaneous\SetupProjects\AssetControlInstaller\AssetControlInstaller\bin\Debug\es-es\AssetControlInstaller.wixpdb

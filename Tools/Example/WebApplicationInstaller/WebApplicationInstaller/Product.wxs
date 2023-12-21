@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:sql="http://schemas.microsoft.com/wix/SqlExtension">
+	
+	<Product Id="*" Name="WebApplicationInstaller3" Language="1033" Version="3.0.0.0" Manufacturer="Telectronica SA" UpgradeCode="ed8a96ba-2d85-4968-af3f-07201fa24da9">
+		
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="WebApplicationInstaller3" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="cmpMyAppFolderSetup" />
+			<ComponentGroupRef Id="sqlComponents" />
+		</Feature>
+		
+		<Binary Id="CreateUpsizingDatabase" SourceFile="install_data.sql" />
+		<util:User Id="SQLUser" Name="[USER_NAME]" Password="[PASSWORD_NAME]" />
+		<sql:SqlDatabase Id="SqlDatabase" Database="[DATABASE_NAME]" Server="[SERVER_NAME]" User="SQLUser" />
+
+	    <UIRef Id="CustomInstallDir"/>
+		<WixVariable Id="WixUILicenseRtf" Value="CustomLicense.rtf"/>
+		<Property Id="WIXUI_INSTALLDIR" Value="MyWebsiteFolder" />
+		
+	</Product>		
+			
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="Inetpub" Name="Inetpub">
+				<Directory Id="wwwroot" Name="wwwroot">
+					<Directory Id="MyWebsiteFolder" Name="013_LRD_Installer" />
+				</Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="MyWebsiteFolder">
+			<Component Id="cmpMyAppPool" Guid="{27D7BA04-706A-4755-9ACF-D026C6A7C1E9}" KeyPath="yes">
+				<iis:WebAppPool Id="MyAppPool"
+								Name="17013_LaundryRFID_LRD_Installer"
+								ManagedRuntimeVersion="v4.0"
+								ManagedPipelineMode="integrated"
+								Identity="localSystem" />
+			</Component>
+
+			<Component Id="cmpMyWebsite" Guid="{95565B4A-C24A-4F64-9644-DE64973DE6B3}" KeyPath="yes">
+				<iis:WebSite Id="website_MyWebsite"
+						Description="17013_LaundryRFID_LRD_Installer"
+						ConfigureIfExists="yes"
+						Directory="MyWebsiteFolder">
+					<iis:WebApplication Id="webapplication_MyWebsite"
+								Name="17013_LaundryRFID_LRD_Installer"
+								WebAppPool="MyAppPool" />
+					<iis:WebAddress Id="webaddress_MyWebsite"
+							Port="17013" />
+				</iis:WebSite>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>		
+		<ComponentGroup Id="cmpMyAppFolderSetup" Directory="MyWebsiteFolder">
+			<Component Id="cmp7AB5216B2DB54A8A9293F6711FFAAA83" Guid="{7AB5216B-2DB5-4A8A-9293-F6711FFAAA83}">
+				<File Id="mainAppEXE" Source="mysetup.exe" />
+				<File Id="mainWebConfig" Source="Web.config" />
+				<File Id="mainInstallData" Source="install_data.sql" />
+			</Component>
+			
+			<!--EDITAR UNA CLAVE DE UN CONNECTION-->
+			<Component Id="cmpUpdateSampleXML" Guid="{CE1F79BC-337A-44FA-9D41-7825564B5CC9}" KeyPath="yes">
+				<util:XmlConfig Id="setConnString"
+								File="[MyWebsiteFolder]Web.config"
+								Action="create"
+								On="install"
+								Node="value"
+								Name="connectionString"
+								Value="metadata=res://*/ModelAsset.csdl|res://*/ModelAsset.ssdl|res://*/ModelAsset.msl;provider=System.Data.SqlClient;provider connection string=  &quot;data source=[SERVER_NAME];initial catalog=[DATABASE_NAME];user id=[USER_NAME];password=[PASSWORD_NAME];Max Pool Size=10000;Pooling=True;MultipleActiveResultSets=True;App=EntityFramework&quot;"
+								ElementPath="//configuration/connectionStrings/add[\[]@name='LaundryEntities'[\]]"
+								Sequence="1" />
+			</Component>
+		</ComponentGroup>	
+
+		<CustomAction
+			 Id="RunMainApp"
+			 FileKey="mainAppEXE"
+			 ExeCommand="install"
+			 Impersonate="yes"
+			 Execute="immediate"
+			 Return="ignore" />
+		
+		<InstallExecuteSequence>
+			<Custom Action="RunMainApp" After="InstallFinalize" />
+		</InstallExecuteSequence>
+	</Fragment>
+
+	<Fragment>		
+        <ComponentGroup Id="sqlComponents" Directory="MyWebsiteFolder">
+		  <Component Id="SqlComponent" Guid="15CCE46E-8EA5-42CA-80C5-AC3DB30A9716">
+			<sql:SqlScript Id="CreateDatabases" SqlDb="SqlDatabase" ExecuteOnInstall="yes" BinaryKey="CreateUpsizingDatabase" /> 
+			<CreateFolder/>
+		  </Component>
+        </ComponentGroup>	
+    </Fragment>
+
+</Wix>

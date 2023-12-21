@@ -1,0 +1,10 @@
+C:\Users\jbonada\Downloads\9781784393212_Code\Chapter_10\code\Recipe_4\WebApplicationInstaller\WebApplicationInstaller\bin\Debug\WebApplicationInstaller.msi
+C:\Users\jbonada\Downloads\9781784393212_Code\Chapter_10\code\Recipe_4\WebApplicationInstaller\WebApplicationInstaller\bin\Debug\WebApplicationInstaller.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\WebApplicationInstaller.wixproj.BindContentsFileListnull.txt
+obj\Debug\WebApplicationInstaller.wixproj.BindOutputsFileListnull.txt
+obj\Debug\WebApplicationInstaller.wixproj.BindBuiltOutputsFileListnull.txt
+C:\Users\jbonada\Desktop\WebApplicationInstaller\WebApplicationInstaller\bin\Debug\WebApplicationInstaller3.msi
+C:\Users\jbonada\Desktop\WebApplicationInstaller\WebApplicationInstaller\bin\Debug\WebApplicationInstaller3.wixpdb
+obj\Debug\CustomInstallDir.wixobj
+obj\Debug\MyCustomDlg.wixobj

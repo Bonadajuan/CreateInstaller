@@ -1,0 +1,10 @@
+obj\Debug\CustomInstallDir.wixobj
+obj\Debug\MyCustomDlg.wixobj
+obj\Debug\Product.wixobj
+C:\Users\jbonada\source\repos\AssetControlInstaller\AssetControlInstaller\bin\Debug\es-es\AssetControlInstaller.msi
+C:\Users\jbonada\source\repos\AssetControlInstaller\AssetControlInstaller\bin\Debug\es-es\AssetControlInstaller.wixpdb
+obj\Debug\AssetControlInstaller.wixproj.BindContentsFileListes-es.txt
+obj\Debug\AssetControlInstaller.wixproj.BindOutputsFileListes-es.txt
+obj\Debug\AssetControlInstaller.wixproj.BindBuiltOutputsFileListes-es.txt
+C:\Telectronica\Miscellaneous\SetupProjects\AssetControlInstaller\AssetControlInstaller\bin\Debug\es-es\AssetControlInstaller.msi
+C:\Telectronica\Miscellaneous\SetupProjects\AssetControlInstaller\AssetControlInstaller\bin\Debug\es-es\AssetControlInstaller.wixpdb

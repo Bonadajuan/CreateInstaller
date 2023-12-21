@@ -1,0 +1,2 @@
+C:\Users\jbonada\Desktop\WebApplicationInstaller\WebApplicationInstaller\bin\Debug\WebApplicationInstaller3.msi
+C:\Users\jbonada\Desktop\WebApplicationInstaller\WebApplicationInstaller\bin\Debug\WebApplicationInstaller3.wixpdb
